@@ -1,0 +1,30 @@
+name: Feedback
+description: A note about something on the live site — wording, an image, a layout problem
+title: "Feedback: "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most feedback arrives automatically from the review-mode widget on the
+        site itself. Use this form when you are writing the note by hand.
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Which page, and roughly where on it
+      placeholder: about.html, the third paragraph
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What should change
+      description: If it is a wording change, the exact replacement text is the most useful thing you can give.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Optional. Drag an image in — it helps most when the problem is visual.

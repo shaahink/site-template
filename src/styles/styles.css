@@ -1,0 +1,18 @@
+/* The design system goes here — and it is deliberately empty in the template.
+   Each site in the fleet looks different on purpose (PLAN §1 goal 2): no
+   shared palette, no shared type, no house style. The moment the template
+   ships a face, every site starts sharing it.
+
+   Two rules the design must honour (PLAN §3.5):
+   - Logical properties only — margin-inline-start, padding-inline-end,
+     inset-inline — never left/right physical properties. RTL then costs
+     nothing when a locale needs it.
+   - html.js gates progressive-enhancement styles (scroll reveals and the
+     like): the class is added by an inline script before first paint, so
+     no-JS visitors simply see everything. */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; }

@@ -1,0 +1,414 @@
+/* Review mode — the widget chrome, in a DELIBERATELY NEUTRAL palette: this
+   is the one piece of visual design the template ships, and it is dull on
+   purpose so the site restyles it in its own terms (strings live in
+   feedback-chrome.js). Everything is prefixed .rv- and the root re-declares
+   inherited properties, so the site's CSS can't leak in and the widget can't
+   leak out. A separate file (not an injected <style>) so the CSP's
+   style-src 'self' covers it. */
+
+.rv-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #f4f4f4;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+}
+.rv-root *,
+.rv-root *::before,
+.rv-root *::after { box-sizing: border-box; }
+/* No colour in the reset: it would outrank the single-class rules below and
+   paint every label with the root's ink, including on light buttons. */
+.rv-root button { font: inherit; margin: 0; cursor: pointer; }
+
+/* Launcher */
+.rv-bar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: stretch;
+  pointer-events: auto;
+  border-radius: 999px;
+  background: #f4f4f4;
+  color: #101010;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.rv-bar button {
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 0 18px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.rv-bar button:hover { background: rgba(16, 16, 16, 0.08); }
+.rv-bar .rv-more { padding: 0 14px; border-left: 1px solid rgba(16, 16, 16, 0.18); font-size: 12px; }
+.rv-dot { width: 8px; height: 8px; border-radius: 50%; background: #666666; flex: none; }
+.rv-badge {
+  background: #666666;
+  color: #101010;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.rv-badge.is-new { animation: rv-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes rv-pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.rv-bar.is-picking { background: #666666; color: #101010; }
+.rv-bar.is-picking .rv-dot { background: #101010; animation: rv-pulse 1.4s infinite; }
+@keyframes rv-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* Menu */
+.rv-menu {
+  position: absolute;
+  right: 16px;
+  bottom: 76px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  pointer-events: auto;
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 6px;
+  min-width: 220px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(244, 244, 244, 0.14);
+}
+.rv-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: #f4f4f4;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 15px;
+}
+.rv-menu button:hover { background: rgba(244, 244, 244, 0.08); }
+.rv-menu .rv-count {
+  padding: 9px 13px 5px;
+  font-size: 12px;
+  color: #9a9a9a;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Element highlight */
+.rv-hl {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid #666666;
+  border-radius: 4px;
+  background: rgba(120, 120, 120, 0.14);
+  transition: all 0.09s ease-out;
+}
+.rv-hl-tag {
+  position: absolute;
+  top: -24px;
+  left: -2px;
+  background: #666666;
+  color: #101010;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 70vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rv-picking,
+.rv-picking * { cursor: crosshair !important; }
+
+/* Composer */
+.rv-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+  animation: rv-fade 0.16s ease-out;
+}
+@keyframes rv-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.rv-sheet {
+  position: absolute;
+  pointer-events: auto;
+  background: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(244, 244, 244, 0.14);
+  width: min(380px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Bottom sheet on phones */
+@media (max-width: 640px) {
+  .rv-sheet {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto !important;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: rv-rise 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  @keyframes rv-rise {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+  }
+}
+
+.rv-ctx {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: #141414;
+  border-bottom: 1px solid rgba(244, 244, 244, 0.1);
+  font-size: 13px;
+  color: #9a9a9a;
+}
+.rv-ctx-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-ctx-text b { color: #f4f4f4; font-weight: 600; }
+.rv-up {
+  flex: none;
+  background: none;
+  border: 1px solid rgba(244, 244, 244, 0.24);
+  border-radius: 7px;
+  color: #f4f4f4;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rv-up:hover { background: rgba(244, 244, 244, 0.08); }
+
+.rv-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.rv-root textarea,
+.rv-root input[type="text"] {
+  font: inherit;
+  font-size: 16px;
+  color: #f4f4f4;
+  width: 100%;
+  background: #101010;
+  border: 1px solid rgba(244, 244, 244, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.rv-root textarea { min-height: 96px; resize: vertical; }
+.rv-root textarea:focus,
+.rv-root input:focus { outline: 2px solid #666666; outline-offset: -1px; border-color: transparent; }
+.rv-root textarea::placeholder,
+.rv-root input::placeholder { color: #9a9a9a; }
+
+.rv-attach { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: #9a9a9a; }
+.rv-attach-btn {
+  background: none;
+  border: 1px dashed rgba(244, 244, 244, 0.3);
+  border-radius: 9px;
+  color: #9a9a9a;
+  padding: 8px 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+}
+.rv-attach-btn:hover { background: rgba(244, 244, 244, 0.06); border-style: solid; }
+.rv-thumb { position: relative; flex: none; }
+.rv-thumb img {
+  display: block;
+  height: 56px;
+  width: auto;
+  max-width: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(244, 244, 244, 0.2);
+}
+.rv-thumb button {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f4f4f4;
+  color: #101010;
+  border: 0;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.rv-drop { outline: 2px dashed #666666; outline-offset: -6px; }
+
+.rv-foot { display: flex; align-items: center; gap: 10px; padding: 0 14px 13px; }
+.rv-foot .rv-msg { flex: 1; font-size: 12.5px; color: #bbbbbb; min-width: 0; }
+.rv-send {
+  background: #f4f4f4;
+  color: #101010;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 20px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.rv-send:hover { background: #ffffff; }
+.rv-send[disabled] { opacity: 0.5; cursor: default; }
+.rv-ghost { background: none; border: 0; color: #9a9a9a; padding: 0 6px; min-height: 44px; font-size: 14px; }
+.rv-ghost:hover { color: #f4f4f4; text-decoration: underline; }
+
+/* Success state — deliberately unmissable, so there is never a doubt about
+   whether a note actually left the building. */
+.rv-done {
+  padding: 34px 24px 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: rv-fade 0.18s ease-out;
+}
+.rv-check {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #666666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  animation: rv-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.rv-check svg { width: 28px; height: 28px; display: block; }
+.rv-check path {
+  stroke: #101010;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  animation: rv-draw 0.34s 0.16s ease-out forwards;
+}
+@keyframes rv-draw {
+  to { stroke-dashoffset: 0; }
+}
+.rv-done h3 { margin: 0; font-size: 19px; font-weight: 700; color: #f4f4f4; }
+.rv-done p { margin: 0; font-size: 14px; color: #9a9a9a; max-width: 30ch; }
+.rv-done-quote {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #9a9a9a;
+  font-style: italic;
+  max-width: 34ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.rv-done-bar {
+  height: 3px;
+  background: #666666;
+  border-radius: 2px;
+  width: 0;
+  margin-top: 16px;
+  align-self: stretch;
+  animation: rv-progress 1.9s linear forwards;
+}
+@keyframes rv-progress {
+  to { width: 100%; }
+}
+
+/* Sent pins */
+.rv-pin {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: #666666;
+  color: #101010;
+  border: 2px solid rgba(244, 244, 244, 0.92);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: default;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.rv-pins { position: absolute; inset: 0; pointer-events: none; }
+
+/* Toast */
+.rv-toast {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 80px;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  pointer-events: auto;
+  max-width: calc(100vw - 32px);
+  background: #f4f4f4;
+  color: #101010;
+  padding: 11px 17px;
+  border-radius: 999px;
+  font-size: 14px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: rv-fade 0.16s ease-out;
+}
+.rv-toast a { color: #555555; }
+.rv-toast button {
+  background: none;
+  border: 1px solid rgba(16, 16, 16, 0.4);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 12.5px;
+  color: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-root * { animation: none !important; transition: none !important; }
+}

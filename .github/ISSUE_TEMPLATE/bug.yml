@@ -1,0 +1,26 @@
+name: Bug
+description: Something on the site is broken
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen instead
+  - type: input
+    id: where
+    attributes:
+      label: Page
+      placeholder: /fr/index.html
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      description: Phone or desktop, and which browser. Layout bugs are usually one or the other.
+      placeholder: iPhone, Safari

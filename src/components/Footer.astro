@@ -1,0 +1,24 @@
+---
+/* The footer. The sk credit comes from @shaahink/sitekit/credits so the whole
+   fleet's credit line changes together — the visible anchor plus the
+   schema.org JSON-LD naming sk as the site's creator (PLAN §3.3).
+   Presentation stays with the site: style .sk-credit however the design
+   wants, but the anchor itself is always the kit's. */
+import { creditsAnchor, creditsJsonLd } from "@shaahink/sitekit/credits";
+
+/* TODO: the client's name and the real production URL. */
+const site = { name: "New Site", url: "https://example.vercel.app/" };
+
+const credit =
+  creditsAnchor({ siteName: site.name, siteUrl: site.url }) +
+  creditsJsonLd({ siteName: site.name, siteUrl: site.url });
+---
+
+<footer>
+  <p>&copy; <span id="current-year"></span> {site.name} · <Fragment set:html={credit} /></p>
+</footer>
+
+<script>
+  const year = document.getElementById("current-year");
+  if (year) year.textContent = String(new Date().getFullYear());
+</script>

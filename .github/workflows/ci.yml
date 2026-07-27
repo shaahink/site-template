@@ -1,0 +1,32 @@
+# The check Renovate's auto-merge waits for. Three gates: the types hold
+# (astro check), the site builds, and vercel.json still matches
+# headers.config.mjs — a hand-edited vercel.json fails the build rather than
+# silently drifting from the definition it is generated from.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run check
+
+      - run: npm run build
+
+      - name: vercel.json is generated, not hand-written
+        run: |
+          npm run headers
+          git diff --exit-code -- vercel.json

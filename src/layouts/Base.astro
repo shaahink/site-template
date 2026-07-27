@@ -1,0 +1,58 @@
+---
+/* The shared shell: head, footer, and the review-mode gate. Pages provide the
+   content and the per-page head facts; everything a page owner can edit lives
+   in src/content, not here.
+
+   Deliberately design-free. The template ships machinery; the site's face —
+   layout, palette, type, navigation — is this site's own work, and it should
+   look like nothing else in the fleet. */
+import Footer from "../components/Footer.astro";
+import "../styles/styles.css";
+
+interface Props {
+  title: string;
+  description: string;
+  ogType?: string;
+  ogDescription: string;
+  ogImage?: string | undefined;
+  canonical: string;
+}
+
+const { title, description, ogType = "website", ogDescription, ogImage, canonical } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={ogDescription} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <!-- Enable progressive-enhancement styles before first paint. Inline and
+         hashed by hand: its sha256 sits in astro.config's CSP block — change
+         one, change both. -->
+    <script is:inline>document.documentElement.classList.add("js");</script>
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <slot />
+
+    <Footer />
+
+    <script>
+      import "../scripts/review-gate.js";
+    </script>
+  </body>
+</html>

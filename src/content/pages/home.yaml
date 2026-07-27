@@ -1,0 +1,9 @@
+meta:
+  title: "New Site"
+  description: "TODO: the one-paragraph description search engines show."
+  ogDescription: "TODO: the shorter line social cards show."
+  canonical: "/"
+
+hero:
+  title: "New Site"
+  tagline: "Built from the sk site template. The design starts here."

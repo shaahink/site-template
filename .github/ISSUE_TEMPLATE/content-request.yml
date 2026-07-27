@@ -1,0 +1,35 @@
+name: Content request
+description: New content, or a structural change the editor deliberately cannot make
+title: "Content: "
+labels: ["content-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The inline editor covers text, images, lists and ordering. Anything
+        structural — a new section, a new page, a different layout — is a
+        request rather than an edit, on purpose. This is that request.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New page
+        - New section on an existing page
+        - New project or work entry
+        - Layout or structure change
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is needed
+      description: Describe the change. Include the actual copy and images if you have them.
+    validations:
+      required: true
+  - type: input
+    id: deadline
+    attributes:
+      label: Needed by
+      description: Optional. A date, or the event it is tied to.

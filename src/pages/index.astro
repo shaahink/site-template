@@ -1,0 +1,24 @@
+---
+/* Home. All prose comes from src/content — pages are the arrangement, not
+   the words. That split is what makes the CMS session possible. */
+import { getEntry } from "astro:content";
+import Base from "../layouts/Base.astro";
+
+const page = await getEntry("homePage", "home");
+if (!page) throw new Error("src/content/pages/home.yaml is missing");
+const { meta, hero } = page.data;
+---
+
+<Base
+  title={meta.title}
+  description={meta.description}
+  ogType={meta.ogType}
+  ogDescription={meta.ogDescription}
+  ogImage={meta.ogImage}
+  canonical={meta.canonical}
+>
+  <main>
+    <h1>{hero.title}</h1>
+    <p>{hero.tagline}</p>
+  </main>
+</Base>

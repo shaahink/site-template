@@ -1,0 +1,24 @@
+# ── sk baseline ──────────────────────────────────────────────────────────
+# Identical in every site under the sk credit line. See shaahink/drydock.
+
+# Secrets. `vercel link` writes .env.local, so this rule has to exist before
+# anyone runs it.
+.env*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.astro/
+.output/
+
+# Host tooling
+.vercel
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
