@@ -4,7 +4,13 @@
    feedback-chrome.js). Everything is prefixed .rv- and the root re-declares
    inherited properties, so the site's CSS can't leak in and the widget can't
    leak out. A separate file (not an injected <style>) so the CSP's
-   style-src 'self' covers it. */
+   style-src 'self' covers it.
+
+   Horizontal properties are logical (inset-inline, border-inline,
+   text-align: start) — nimagiti proved the same rules mirror themselves
+   under dir="rtl" with no RTL-specific CSS at all. Keep them logical; the
+   JS's left/top for highlights and pins is viewport geometry and stays
+   physical on purpose. */
 
 .rv-root {
   position: fixed;
@@ -18,7 +24,7 @@
   font-weight: 400;
   font-style: normal;
   letter-spacing: normal;
-  text-align: left;
+  text-align: start;
   text-transform: none;
 }
 .rv-root *,
@@ -31,7 +37,7 @@
 /* Launcher */
 .rv-bar {
   position: absolute;
-  right: 16px;
+  inset-inline-end: 16px;
   bottom: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
   display: flex;
@@ -55,7 +61,7 @@
   white-space: nowrap;
 }
 .rv-bar button:hover { background: rgba(16, 16, 16, 0.08); }
-.rv-bar .rv-more { padding: 0 14px; border-left: 1px solid rgba(16, 16, 16, 0.18); font-size: 12px; }
+.rv-bar .rv-more { padding: 0 14px; border-inline-start: 1px solid rgba(16, 16, 16, 0.18); font-size: 12px; }
 .rv-dot { width: 8px; height: 8px; border-radius: 50%; background: #666666; flex: none; }
 .rv-badge {
   background: #666666;
@@ -87,7 +93,7 @@
 /* Menu */
 .rv-menu {
   position: absolute;
-  right: 16px;
+  inset-inline-end: 16px;
   bottom: 76px;
   bottom: calc(76px + env(safe-area-inset-bottom));
   pointer-events: auto;
@@ -101,7 +107,7 @@
 .rv-menu button {
   display: block;
   width: 100%;
-  text-align: left;
+  text-align: start;
   background: none;
   border: 0;
   color: #f4f4f4;
@@ -130,7 +136,7 @@
 .rv-hl-tag {
   position: absolute;
   top: -24px;
-  left: -2px;
+  inset-inline-start: -2px;
   background: #666666;
   color: #101010;
   font-size: 11px;
@@ -172,8 +178,7 @@
 /* Bottom sheet on phones */
 @media (max-width: 640px) {
   .rv-sheet {
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     bottom: 0;
     top: auto !important;
     width: 100%;
@@ -263,7 +268,7 @@
 .rv-thumb button {
   position: absolute;
   top: -7px;
-  right: -7px;
+  inset-inline-end: -7px;
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -383,8 +388,9 @@
 /* Toast */
 .rv-toast {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  inset-inline: 0;
+  margin-inline: auto;
+  width: max-content;
   bottom: 80px;
   bottom: calc(80px + env(safe-area-inset-bottom));
   pointer-events: auto;

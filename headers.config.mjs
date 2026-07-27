@@ -4,6 +4,9 @@
    changes, which is the point: no host-specific file is ever hand-maintained. */
 
 export default {
+  /* Astro's static build, told to Vercel via the kit's 0.2.0 passthrough. */
+  vercel: { framework: "astro", outputDirectory: "dist" },
+
   /* Screenshot uploads land on this branch; they must never deploy. */
   disableDeploymentsFor: ["feedback-assets"],
 
