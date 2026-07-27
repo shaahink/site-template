@@ -42,7 +42,14 @@ export default defineConfig({
      forever (Bez shipped exactly that in session 3; session 4's screenshot
      verification caught it). Write `--serif: var(--font-cormorant)` and put
      the fallback stack in the font entry above, where the variable is
-     assembled. */
+     assembled.
+
+     Preloading: pass `preload` on the layout's <Font /> components for the
+     faces that paint above the fold, and only those — every preload competes
+     with the hero image. Filter by subset or style, never by weight: the
+     API records each merged file under its first face's weight, so a weight
+     filter silently misses. Per-locale sites preload conditionally, so each
+     locale pays only for its own families. */
 
   security: {
     csp: {

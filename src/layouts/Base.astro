@@ -6,6 +6,7 @@
    Deliberately design-free. The template ships machinery; the site's face —
    layout, palette, type, navigation — is this site's own work, and it should
    look like nothing else in the fleet. */
+import { absolute } from "@shaahink/sitekit/seo";
 import Footer from "../components/Footer.astro";
 import "../styles/styles.css";
 
@@ -19,6 +20,13 @@ interface Props {
 }
 
 const { title, description, ogType = "website", ogDescription, ogImage, canonical } = Astro.props;
+
+/* Content states paths; the head publishes absolute URLs resolved against
+   astro.config's `site` — the one tracked place the origin lives, so a
+   domain change never touches this file. Scrapers reject relative
+   canonical/og:image anyway. */
+const canonicalUrl = absolute(Astro.site!, canonical);
+const ogImageUrl = ogImage && absolute(Astro.site!, ogImage);
 ---
 
 <html lang="en">
@@ -28,15 +36,16 @@ const { title, description, ogType = "website", ogDescription, ogImage, canonica
     <title>{title}</title>
 
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <link rel="canonical" href={canonicalUrl} />
 
     <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={ogDescription} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 
     <!-- Enable progressive-enhancement styles before first paint. Inline and
          hashed by hand: its sha256 sits in astro.config's CSP block — change

@@ -5,9 +5,12 @@
    Presentation stays with the site: style .sk-credit however the design
    wants, but the anchor itself is always the kit's. */
 import { creditsAnchor, creditsJsonLd } from "@shaahink/sitekit/credits";
+import { absolute } from "@shaahink/sitekit/seo";
 
-/* TODO: the client's name and the real production URL. */
-const site = { name: "New Site", url: "https://example.vercel.app/" };
+/* TODO: the client's name. The url is derived, not stated: astro.config's
+   `site` is the only place the origin lives, so a domain change never
+   touches this file. */
+const site = { name: "New Site", url: absolute(Astro.site!) };
 
 const credit =
   creditsAnchor({ siteName: site.name, siteUrl: site.url }) +
