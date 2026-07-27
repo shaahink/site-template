@@ -57,7 +57,10 @@ export default defineConfig({
          screenshot preview. Add third-party origins here deliberately, one
          by one, when the design demands them — and "media-src 'self'" the
          day the site ships audio or video (shade and elfine both needed it
-         for their mp4s). */
+         for their mp4s). When the analytics tag goes live (see Base.astro),
+         https://sk-stats.vercel.app joins both connect-src below and the
+         script resources — the tracker is an external script and its beacon
+         posts back to the same origin. */
       directives: [
         "default-src 'self'",
         "img-src 'self' data:",

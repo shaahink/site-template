@@ -52,6 +52,21 @@ const ogImageUrl = ogImage && absolute(Astro.site!, ogImage);
          one, change both. -->
     <script is:inline>document.documentElement.classList.add("js");</script>
 
+    <!-- Owner-facing stats (PLAN §3.7): once this site has its row in the
+         sk-stats instance, import umamiTag from "@shaahink/sitekit/analytics"
+         and drop the tag here — cookieless, so no consent banner. The
+         sk-stats origin must join script-src and connect-src in
+         astro.config's CSP in the same commit.
+
+         <script
+           is:inline
+           {...umamiTag({
+             src: "https://sk-stats.vercel.app/script.js",
+             websiteId: "the id from Settings → Websites"
+           })}
+         />
+    -->
+
     <slot name="head" />
   </head>
 
