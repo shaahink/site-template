@@ -8,7 +8,15 @@ export default defineConfig({
   /* Locales for this site. One entry keeps URLs unprefixed; add a second and
      Astro's i18n routing takes over — set lang/dir per locale in the layout.
      RTL locales cost nothing if new CSS sticks to logical properties
-     (PLAN §3.5). */
+     (PLAN §3.5).
+
+     The bilingual pattern, proven on elfine (session 4): per-locale content
+     entries (home.en.yaml / home.fr.yaml, one schema), a locale-prefixed
+     pages dir (src/pages/fr/index.astro), and one shared component the thin
+     pages parameterize with a locale prop. Two traps: the glob loader slugs
+     the dot out of "home.fr" unless you pass generateId, and build.format
+     "file" flattens /fr/ into /fr.html — locale-directory sites need the
+     default "directory" format. */
   i18n: { locales: ["en"], defaultLocale: "en" },
 
   /* No markdown is rendered by default; this silences the build's
@@ -21,17 +29,28 @@ export default defineConfig({
 
      import { fontProviders } from "astro/config";
      fonts: [{ provider: fontProviders.google(), name: "…",
-               cssVariable: "--font-…", weights: […], subsets: […] }],
+               cssVariable: "--font-…", weights: […], subsets: […],
+               fallbacks: […] }],
 
      and add <Font cssVariable="…" /> to the layout head. Pin subsets
      explicitly if any script beyond latin matters — a dropped subset is
-     silent tofu. */
+     silent tofu.
+
+     ⚠ The built CSS hashes the family names, so site CSS must consume the
+     cssVariable — never the raw name. A token like
+     `--serif: "Cormorant Garamond", Georgia, serif` silently renders Georgia
+     forever (Bez shipped exactly that in session 3; session 4's screenshot
+     verification caught it). Write `--serif: var(--font-cormorant)` and put
+     the fallback stack in the font entry above, where the variable is
+     assembled. */
 
   security: {
     csp: {
       /* Everything same-origin. data: images are the feedback widget's
          screenshot preview. Add third-party origins here deliberately, one
-         by one, when the design demands them. */
+         by one, when the design demands them — and "media-src 'self'" the
+         day the site ships audio or video (shade and elfine both needed it
+         for their mp4s). */
       directives: [
         "default-src 'self'",
         "img-src 'self' data:",

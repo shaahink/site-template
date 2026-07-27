@@ -7,6 +7,10 @@ export default {
   /* Screenshot uploads land on this branch; they must never deploy. */
   disableDeploymentsFor: ["feedback-assets"],
 
+  /* Redirects emit for both hosts too. shade-site turned its old about.html
+     meta-refresh page into the 301 it always wanted to be:
+       redirects: [{ from: "/about.html", to: "/", status: 301 }], */
+
   headers: [
     {
       path: "/*",

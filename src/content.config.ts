@@ -5,7 +5,18 @@
 
    This file starts with one page collection as the pattern. Grow it to match
    the content the site actually has — not the CMS you can imagine
-   (sessions/03-astro-pilot.md in shaahink/drydock, "Schema overreach"). */
+   (sessions/03-astro-pilot.md in shaahink/drydock, "Schema overreach").
+
+   Bilingual sites keep one schema and per-locale entries — home.en.yaml and
+   home.fr.yaml, looked up as `home.${locale}`. Pass generateId to the glob
+   loader for dotted names: the default id generator slugs "home.fr" into
+   "homefr" (elfine, session 4):
+
+     loader: glob({ pattern: "home.*.yaml", base: "./src/content/pages",
+                    generateId: ({ entry }) => entry.replace(/\.yaml$/, "") })
+
+   Localized alt texts and aria labels are content too — the French page
+   describes photographs in French. */
 
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
