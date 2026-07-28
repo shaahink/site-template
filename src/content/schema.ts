@@ -52,11 +52,67 @@ export const meta = z.object({
    key like `p1`, `sub`, `cta` or `fa` produces "Changing P1" — a programmer's
    shorthand handed to a client. The keys themselves stay as they are, because
    they are what the YAML files spell. */
+/** Whether a section is on the site.
+    ---------------------------------------------------------------------------
+    Put it on the sections that can genuinely come and go, and *only* on those.
+    PLAN §3.9 draws the line here: whether a section the designer built appears
+    at all is content and therefore the owner's; creating one, moving one, or
+    changing how it looks is still a content-request issue.
+
+    Deciding the list is per-site work, and it is judgement rather than a
+    default. A hero, an about block and a contact block are what a page *is*; a
+    seasonal offer, a gallery, a set of collaborators, anything advertising
+    something that might end — those are what an owner wants a switch for.
+
+    Defaulting to true means no content file needs changing and a section
+    *without* the field simply cannot be hidden, which is the safe answer for
+    anything structural. The editor lifts it out of the form and draws it as a
+    switch at the head of the section, so it never sits among the words.
+
+    It is on `notes` below so the pattern is here and working. Delete that
+    section or keep it; keep the shape either way. */
+export const visible = z.boolean().default(true);
+
+/** A picture.
+    ---------------------------------------------------------------------------
+    **Spell it exactly like this and the owner gets a photo picker for free.**
+    The kit recognises a picture from its shape — a `src` string beside `w` and
+    `h` integers — rather than from anything a site declares, so a new site
+    inherits the picker by following the convention. Choosing a photograph
+    scales it in the browser, writes the file and both sizes, and holds Save
+    until `alt` has been written.
+
+    `w`/`h` belong in `omit` below. They are structure wearing a number's
+    clothing and the layouts depend on them; omitting them hides them from the
+    form, not from the picker, which reads this schema.
+
+    Two shapes the picker cannot serve, and both exist in the fleet: images
+    behind `astro:assets` (nimagiti), where the YAML holds a path Astro
+    resolves inside the build; and pre-built responsive variants (elfine),
+    where a new photograph would need a `srcset` of several files that do not
+    exist yet. Either is a fine choice — `omit` the image field and leave new
+    photographs to a content-request issue — but if the site can use this
+    shape, use this shape. */
+export const picture = z.object({
+  src: z.string(),
+  alt: z.string().default(""),
+  w: z.number().int().positive(),
+  h: z.number().int().positive()
+});
+
 export const homePageSchema = z.object({
   meta,
   hero: z.object({
     title: z.string(),
     tagline: z.string().meta({ title: "Tagline under the title" })
+  }),
+  /* A section that can be turned off — the working example of the pattern.
+     index.astro renders it through `isVisible`, and a site that grows a nav
+     filters that nav's links through `visibleOnly`. */
+  notes: z.object({
+    visible,
+    title: z.string(),
+    body: z.string().meta({ title: "The paragraph" })
   })
 });
 

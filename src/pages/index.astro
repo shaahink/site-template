@@ -2,11 +2,31 @@
 /* Home. All prose comes from src/content — pages are the arrangement, not
    the words. That split is what makes the CMS session possible. */
 import { getEntry } from "astro:content";
+import { isVisible } from "@shaahink/sitekit/visibility";
 import Base from "../layouts/Base.astro";
 
 const page = await getEntry("homePage", "home");
 if (!page) throw new Error("src/content/pages/home.yaml is missing");
-const { meta, hero } = page.data;
+const { meta, hero, notes } = page.data;
+
+/* When this site grows a navigation, filter it from the same data rather than
+   maintaining a second list of what exists:
+
+     import { visibleOnly } from "@shaahink/sitekit/visibility";
+     const links = visibleOnly(
+       [
+         { href: "#notes", label: "Notes", section: "notes" },
+         { href: "/about", label: "About" }        // no section: always kept
+       ],
+       page.data
+     );
+
+   A link to a section that is not rendered scrolls nowhere, silently, and the
+   nav is the first thing an owner tries after turning something off. If the
+   nav's labels are themselves content and carry `data-sk-edit`, keep each
+   item's **original** index through the filter — number the rows first, then
+   filter — or every annotation past a hidden section points at its neighbour.
+   elfine's Home.astro does this; the trap is real and it looks correct. */
 ---
 
 <Base
@@ -27,5 +47,25 @@ const { meta, hero } = page.data;
         says so on the page rather than silently refusing to save. */}
     <h1 data-sk-edit="hero.title">{hero.title}</h1>
     <p data-sk-edit="hero.tagline">{hero.tagline}</p>
+
+    {/* A section the owner can turn off. Not rendered when it is off, rather
+        than hidden with a class: text still in the HTML is text a search
+        engine indexes and anyone reading source can read, which is not what
+        "hide this" means to the person asking.
+
+        `isVisible(page.data, "notes")` rather than `notes.visible`, and the
+        difference is not style: a flag missing for any reason has to read as
+        *shown*. Astro's content cache served a pre-schema parse once while
+        this was being written, the plain property was `undefined`, and a whole
+        section came off a live page in silence. The wrong answer that shows a
+        section gets noticed; the one that deletes it does not.
+
+        A JS comment, not an HTML one, so none of this ships to a visitor. */}
+    {isVisible(page.data, "notes") && (
+      <section id="notes">
+        <h2 data-sk-edit="notes.title">{notes.title}</h2>
+        <p data-sk-edit="notes.body">{notes.body}</p>
+      </section>
+    )}
   </main>
 </Base>
