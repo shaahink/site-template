@@ -45,7 +45,11 @@ jobs:
       # The editor's chrome lives in the kit and is copied here, so that the
       # panel cannot quietly become four different panels. A hand edit to the
       # copy is the first step of exactly that, and this is where it stops.
-      - name: the editor's stylesheet is the kit's, copied
+      # Two files now: the panel at /edit, and inline editing on the site's own
+      # pages. `git diff` alone would miss a stylesheet the kit has started
+      # shipping but this site has never copied, so untracked files count too.
+      - name: the editor's stylesheets are the kit's, copied
         run: |
           npm run editor
-          git diff --exit-code -- public/editor-panel.css
+          test -z "$(git status --porcelain -- public/)" \
+            || { git status --porcelain -- public/; exit 1; }

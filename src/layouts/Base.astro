@@ -17,9 +17,24 @@ interface Props {
   ogDescription: string;
   ogImage?: string | undefined;
   canonical: string;
+  /* Which content file this page is showing, for inline editing. A page that
+     omits them simply has no inline editing — the gate finds no collection and
+     stops, which is the right behaviour for a page assembled from several
+     entries rather than a wrong guess about which one to write to. */
+  editCollection?: string;
+  editEntry?: string;
 }
 
-const { title, description, ogType = "website", ogDescription, ogImage, canonical } = Astro.props;
+const {
+  title,
+  description,
+  ogType = "website",
+  ogDescription,
+  ogImage,
+  canonical,
+  editCollection,
+  editEntry
+} = Astro.props;
 
 /* Content states paths; the head publishes absolute URLs resolved against
    astro.config's `site` — the one tracked place the origin lives, so a
@@ -70,13 +85,33 @@ const ogImageUrl = ogImage && absolute(Astro.site!, ogImage);
     <slot name="head" />
   </head>
 
-  <body>
+  <!-- The editor reads these to know which file this page is showing.
+       `data-sk-editor-path` is /edit here because this template builds with
+       format "directory"; a site with format "file" says /edit.html. -->
+  <body
+    data-sk-collection={editCollection}
+    data-sk-entry={editEntry}
+    data-sk-editor-path="/edit"
+  >
     <slot />
 
     <Footer />
 
     <script>
       import "../scripts/review-gate.js";
+      /* Inline editing's gate — the same shape as review-gate.js, and the only
+         inline-editing code a public visitor ever runs. It reads ?edit=1 and
+         dynamically imports the editor only for someone who asked; the public
+         downloads this import statement and nothing else, which is why the
+         public pages' CSP needs no Google origin, no new connect-src and no
+         new style-src. The panel it defers to is entirely in the kit.
+
+         Called rather than bare-imported: the kit is `sideEffects: false`, so
+         a bare import of a side-effecting module is tree-shaken away to
+         nothing and the gate silently never runs. */
+      import { installInlineEditor } from "@shaahink/sitekit/editor/inline-gate";
+
+      installInlineEditor();
     </script>
   </body>
 </html>

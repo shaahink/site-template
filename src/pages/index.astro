@@ -16,9 +16,16 @@ const { meta, hero } = page.data;
   ogDescription={meta.ogDescription}
   ogImage={meta.ogImage}
   canonical={meta.canonical}
+  editCollection="homePage"
+  editEntry="home"
 >
   <main>
-    <h1>{hero.title}</h1>
-    <p>{hero.tagline}</p>
+    {/* `data-sk-edit` names the content path the element is showing, and sits
+        beside the binding it names so it is easy to write and obvious when it
+        rots. The editor checks both that the path resolves and that the
+        element is showing that value verbatim — an annotation that has drifted
+        says so on the page rather than silently refusing to save. */}
+    <h1 data-sk-edit="hero.title">{hero.title}</h1>
+    <p data-sk-edit="hero.tagline">{hero.tagline}</p>
   </main>
 </Base>
