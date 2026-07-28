@@ -35,26 +35,38 @@ created automatically on the first photo.
 
 ## One-time setup
 
-### 1. Create a GitHub token
+### 1. Install the `sk-feedback` GitHub App on this repo
 
-[github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new) — a **fine-grained** token:
+There is no token to create. The fleet moved off personal access tokens in
+session 7: a PAT belongs to a person, expires, and authors every issue and
+commit in their name, which is a poor thing for a client's site to depend on.
+The App is installed across all repositories, mints a short-lived token per
+request, and signs its work as `sk-feedback[bot]`.
 
-- **Repository access** → Only select repositories → this repo
-- **Permissions** → Repository permissions:
-  - **Issues** → Read and write
-  - **Contents** → Read and write  *(for screenshots)*
-- Expiry: whatever suits — the widget fails loudly when it lapses.
+So step 1 is to confirm the installation covers this repo —
+<https://github.com/settings/installations> — and to have the App's id,
+installation id and PKCS#8 private key to hand. The control room's `CONFIG.md`
+records where they live.
+
+⚠ **A GitHub API 404 can mean "the installation cannot see this repo", not
+"no such file".** If the editor saves fail as missing files, check coverage
+before you check paths.
 
 ### 2. Add environment variables in Vercel
 
-Project → Settings → Environment Variables (all environments):
+Project → Settings → Environment Variables (all three environments):
 
 | Name | Value |
 | --- | --- |
-| `FEEDBACK_GITHUB_TOKEN` | the token from step 1 |
+| `FEEDBACK_GITHUB_APP_ID` | the App's id — `gh api apps/sk-feedback` returns it |
+| `FEEDBACK_GITHUB_APP_PRIVATE_KEY` | PKCS#8 only — GitHub hands out PKCS#1 |
+| `FEEDBACK_GITHUB_APP_INSTALLATION_ID` | the installation covering this repo |
 | `FEEDBACK_GITHUB_REPO` | `shaahink/<this-repo>` |
 | `FEEDBACK_REVIEW_KEY` | any secret word |
 | `FEEDBACK_SITE_URL` | the real production URL |
+
+Convert the key once, before it ever reaches an environment variable:
+`openssl pkcs8 -topk8 -nocrypt -in app.pem`. Web Crypto cannot import PKCS#1.
 
 `FEEDBACK_SITE_URL` matters: it is the origin GitHub uses to fetch screenshots,
 so it must be the real public URL, not a preview deployment.
