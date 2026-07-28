@@ -47,7 +47,37 @@ and it appears in the editor.
 
 ---
 
-## What an owner sees
+## What an owner sees first
+
+Before any of the fields: a short panel saying what this is, that everything
+typed here goes onto the real site, and that nothing is permanent. It appears
+once, is dismissed with a button, and comes back from the `?` beside it. It is
+three sentences and two links rather than a tour, deliberately — the strongest
+version of onboarding is that every empty state and error already reads like a
+person wrote it, which is where the effort went.
+
+Below it, when the site has been given the pieces, two blocks and an action:
+
+- **Did anyone come?** Visitors and views for the last 7 and 30 days, the three
+  pages people actually read, and a link to their own permanent analytics page.
+  A site with no traffic yet says so in words rather than showing four zeroes.
+- **What you changed.** Their own last five content changes, in plain words
+  (*"Changed 2 things on home"*), each with a link to exactly what changed —
+  and whether the most recent one is on the site yet. When a deploy has failed,
+  the host's own sentence is quoted, because *"Deployment rate limited — retry
+  in 24 hours"* tells somebody what to do and *"something went wrong"* does not.
+- **Ask for a change.** Anything bigger than words and pictures — a new section,
+  a different layout — is a conversation, and this is what makes asking as easy
+  as editing. It files a `content-request` issue in this repository under the
+  owner's name.
+
+**Every one of those is optional and silent when absent.** No analytics
+credential means no traffic block, not an error; a repository the App cannot
+read means no change list. Nothing here can delay or break the form — an owner
+who came to fix a typo must never meet an outage in a subsystem they have never
+heard of.
+
+## What an owner can edit
 
 Everything in `src/content` that is text, grouped the way the schema groups it.
 Whatever the schemas describe as text. Image `alt`, the `<head>` facts and the
@@ -179,7 +209,26 @@ In Vercel → Settings → Environment Variables:
 The GitHub credential is **not** new: `FEEDBACK_GITHUB_APP_ID`,
 `FEEDBACK_GITHUB_APP_PRIVATE_KEY`, `FEEDBACK_GITHUB_APP_INSTALLATION_ID` and
 `FEEDBACK_GITHUB_REPO` are already set for review mode, and the editor reuses
-them.
+them. The recent-changes list and the deploy state come from that same
+credential — nothing was added for them.
+
+Three more, all optional, for the owner's own traffic:
+
+| Variable | Value |
+| --- | --- |
+| `UMAMI_URL` | the analytics instance, e.g. `https://sk-stats.vercel.app` |
+| `UMAMI_USERNAME` | the **read-only** account, never the admin one |
+| `UMAMI_PASSWORD` | its password |
+
+Leave all three out and the editor simply has no traffic block. There is no
+`UMAMI_TEAM_ID` here: that one is for enumerating a whole fleet, and this reads
+one website by id, which the instance serves without it.
+
+**The website id is not a variable.** It is already public — the page's own
+tracker tag carries it — so it lives in the repository, passed to
+`createContentHandler` as `umamiWebsiteId` in `api/content.ts`. Keep it equal to
+the one in `src/layouts/Base.astro`; they are the same site, one writing and one
+reading.
 
 ### 3. The allowlist
 

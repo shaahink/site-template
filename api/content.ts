@@ -22,6 +22,10 @@
      FEEDBACK_GITHUB_REPO   required  e.g. "shaahink/<this-repo>"
      CMS_BRANCH             optional  defaults to the repo's default branch
      FEEDBACK_ALLOWED_ORIGIN optional one extra origin allowed to post
+     UMAMI_URL              optional  ┐ the owner's own traffic, in the editor.
+     UMAMI_USERNAME         optional  │ Read-only account. All three absent is
+     UMAMI_PASSWORD         optional  ┘ supported — there is simply no traffic
+                                       block, and nothing else changes.
    ------------------------------------------------------------------------ */
 
 import { createContentHandler } from "@shaahink/sitekit/cms";
@@ -37,8 +41,19 @@ const handler = createContentHandler({
     appInstallationId: process.env.FEEDBACK_GITHUB_APP_INSTALLATION_ID,
     repo: process.env.FEEDBACK_GITHUB_REPO,
     branch: process.env.CMS_BRANCH,
-    allowedOrigin: process.env.FEEDBACK_ALLOWED_ORIGIN
+    allowedOrigin: process.env.FEEDBACK_ALLOWED_ORIGIN,
+    umamiUrl: process.env.UMAMI_URL,
+    umamiUsername: process.env.UMAMI_USERNAME,
+    umamiPassword: process.env.UMAMI_PASSWORD
   }),
+  /* This site in the analytics instance. Deliberately not an environment
+     variable: it is already public — src/layouts/Base.astro puts it in the
+     page's own tracker tag — and a value that is in the markup does not
+     become a secret by also being in a deployment's settings. **Keep it
+     equal to the one in Base.astro**: same site, one writing and one
+     reading, and a mismatch shows up as a traffic block that is quietly
+     absent rather than as an error. */
+  umamiWebsiteId: "the id from Settings → Websites",
   userAgent: "site-editor"
 });
 
