@@ -45,11 +45,18 @@ export const meta = z.object({
   canonical: z.string()
 });
 
+/* Name a field with `.meta({ title })` wherever its key is not already a word
+   the owner would use. This is not cosmetic: the inline editor puts the label
+   in the bar as "Changing {label}" while they type, and that sentence is the
+   whole of what tells them which piece of text they have their finger on. A
+   key like `p1`, `sub`, `cta` or `fa` produces "Changing P1" — a programmer's
+   shorthand handed to a client. The keys themselves stay as they are, because
+   they are what the YAML files spell. */
 export const homePageSchema = z.object({
   meta,
   hero: z.object({
     title: z.string(),
-    tagline: z.string()
+    tagline: z.string().meta({ title: "Tagline under the title" })
   })
 });
 
@@ -69,7 +76,17 @@ export const editable = {
   homePage: {
     label: "Home page",
     schema: homePageSchema,
-    file: "src/content/pages/home.yaml"
+    file: "src/content/pages/home.yaml",
+    /* Where this entry can be seen on the site, so the panel can offer to go
+       and edit it on the page itself. It is the only route to inline editing
+       that does not involve typing `?edit=1` onto the end of a URL, which is
+       to say the only one that exists on a phone — so give every entry one.
+
+       "/" because this template builds with format "directory"; a site with
+       format "file" says "/index.html". A directory collection takes a
+       pattern instead: entryUrl: "/projects/{entry}". Only site-relative
+       paths; the kit drops anything else. */
+    entryUrl: "/"
     // omit: ["hero.image.w", "hero.image.h"]
   }
 };
