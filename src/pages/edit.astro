@@ -62,14 +62,37 @@ csp.insertDirective("img-src 'self' data: https://lh3.googleusercontent.com");
    sources — so 'self' has to be restated or the panel's own stylesheet is
    blocked on the one page that needs it.
 
-   'unsafe-inline' is here for the <style> Google Identity Services injects,
-   but CSP ignores 'unsafe-inline' whenever a hash is present and Astro puts
-   the build's stylesheet hashes here. So it does nothing today. It states the
-   intent, and whether GIS needs it at all is genuinely unknown — recent
-   versions render the button inside an iframe from accounts.google.com, which
-   frame-src already covers. */
+   **Corrected 2026-07-28, from what production actually reported.** This block
+   used to say that whether Google Identity Services needs any of this was
+   "genuinely unknown". It is known now: with sign-in configured and the button
+   on screen, the console says
+
+     Loading the stylesheet 'https://accounts.google.com/gsi/style' violates
+     the following Content Security Policy directive: "style-src-elem 'self'
+     'unsafe-inline'"
+
+   — so GIS does load a stylesheet into *this* document, and 'unsafe-inline'
+   never covered it, both because a host is not inline and because CSP ignores
+   'unsafe-inline' as soon as a hash is present, which Astro's own stylesheet
+   hashes guarantee. The origin has to be named.
+
+   Sign-in works regardless, and did before this line existed: the button is a
+   cross-origin iframe that styles itself. What was blocked is everything GIS
+   renders into the parent page — One Tap, the account chooser, its own error
+   prompts — which is exactly the surface this editor would reach for next. */
 csp.insertStyleResource({ resource: "'self'", kind: "element" });
 csp.insertStyleResource({ resource: "'unsafe-inline'", kind: "element" });
+csp.insertStyleResource({ resource: "https://accounts.google.com", kind: "element" });
+
+/* And the style *attributes* GIS sets on the elements it creates here. Hashes
+   never apply to attributes, so 'unsafe-inline' is the only spelling that
+   works; `kind: "attribute"` keeps it in `style-src-attr` rather than
+   loosening `style-src` as a whole, and it reaches this route only.
+
+   Not `insertDirective("style-src-attr …")`: that emits the same header but
+   Astro's types refuse the name, and `astro check` is what caught it — after
+   a build had already succeeded, because a build does not typecheck. */
+csp.insertStyleResource({ resource: "'unsafe-inline'", kind: "attribute" });
 ---
 
 <html lang="en">
