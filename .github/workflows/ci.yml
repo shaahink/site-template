@@ -1,7 +1,10 @@
-# The check Renovate's auto-merge waits for. Three gates: the types hold
-# (astro check), the site builds, and vercel.json still matches
-# headers.config.mjs — a hand-edited vercel.json fails the build rather than
-# silently drifting from the definition it is generated from.
+# The check Renovate's auto-merge waits for. Five gates: the types hold
+# (astro check), the site builds, vercel.json still matches
+# headers.config.mjs, every content file is still normalized, and the editor's
+# stylesheet still matches the kit's. The last three work the same way —
+# regenerate, then diff — so a hand-edited vercel.json, a hand-edited content
+# file or a hand-edited editor stylesheet fails the build rather than silently
+# drifting from the form it is meant to be in.
 name: CI
 
 on:
@@ -30,3 +33,19 @@ jobs:
         run: |
           npm run headers
           git diff --exit-code -- vercel.json
+
+      # A hand edit that un-normalizes a file would make the next owner edit
+      # produce a hundred-line diff instead of a one-line one. Catch it here,
+      # while it is still one commit to fix.
+      - name: content is normalized, so owner edits stay readable
+        run: |
+          npm run content
+          git diff --exit-code -- src/content
+
+      # The editor's chrome lives in the kit and is copied here, so that the
+      # panel cannot quietly become four different panels. A hand edit to the
+      # copy is the first step of exactly that, and this is where it stops.
+      - name: the editor's stylesheet is the kit's, copied
+        run: |
+          npm run editor
+          git diff --exit-code -- public/editor-panel.css

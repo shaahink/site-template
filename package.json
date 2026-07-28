@@ -8,15 +8,18 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "headers": "node scripts/emit-headers.mjs"
+    "headers": "node scripts/emit-headers.mjs",
+    "content": "node scripts/normalize-content.mjs",
+    "editor": "sitekit-editor-css"
   },
   "dependencies": {
-    "@shaahink/sitekit": "0.3.0",
+    "@shaahink/sitekit": "0.6.0",
     "astro": "7.1.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@types/node": "22.20.1",
     "typescript": "6.0.3"
   }
 }

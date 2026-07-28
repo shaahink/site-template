@@ -1,46 +1,26 @@
-/* The content model. Everything an owner might one day edit lives in
-   src/content as YAML, validated here — the CMS session generates its editor
-   from these schemas, so shape each field for that: strings the owner would
-   recognise, numbers only where the layout needs them.
+/* The Astro half of the content model.
+   ---------------------------------------------------------------------------
+   The schemas live in src/content/schema.ts with Zod as their only import;
+   this file pairs each with the loader that finds its files. The split is what
+   lets the editor's Vercel function import the same schemas the build validates
+   against — `astro:content` and `astro/loaders` only exist inside Astro's
+   build, so a function can never reach them. See CMS.md.
 
-   This file starts with one page collection as the pattern. Grow it to match
-   the content the site actually has — not the CMS you can imagine
-   (sessions/03-astro-pilot.md in shaahink/drydock, "Schema overreach").
+   Adding a collection touches three places: the schema in schema.ts, the loader
+   here, and an entry in schema.ts's `editable` map so the editor can find its
+   file. Miss the third and the collection simply isn't editable — which is a
+   legitimate choice, not an error.
 
-   Bilingual sites keep one schema and per-locale entries — home.en.yaml and
-   home.fr.yaml, looked up as `home.${locale}`. Pass generateId to the glob
-   loader for dotted names: the default id generator slugs "home.fr" into
-   "homefr" (elfine, session 4):
-
-     loader: glob({ pattern: "home.*.yaml", base: "./src/content/pages",
-                    generateId: ({ entry }) => entry.replace(/\.yaml$/, "") })
-
-   Localized alt texts and aria labels are content too — the French page
-   describes photographs in French. */
+   If the site puts images through astro:assets, hand `image()` to the schema
+   here — `schema: ({ image }) => pageSchema(image)`. See nimagiti. */
 
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
-import { z } from "zod";
-
-/** Per-page <head> facts. og fields feed the social cards. */
-const meta = z.object({
-  title: z.string(),
-  description: z.string(),
-  ogType: z.string().default("website"),
-  ogDescription: z.string(),
-  ogImage: z.string().optional(),
-  canonical: z.string()
-});
+import { homePageSchema } from "./content/schema.js";
 
 const homePage = defineCollection({
   loader: glob({ pattern: "home.yaml", base: "./src/content/pages" }),
-  schema: z.object({
-    meta,
-    hero: z.object({
-      title: z.string(),
-      tagline: z.string()
-    })
-  })
+  schema: homePageSchema
 });
 
 export const collections = { homePage };

@@ -6,12 +6,16 @@ describes what the template provides.
 ## Stack
 
 Astro 7, strict TypeScript, static output. Content lives in typed collections
-under `src/content/`, validated by `src/content.config.ts`; the pages are
-arrangement, not words. Feedback machinery comes from `@shaahink/sitekit`
-(pinned exactly) — see `FEEDBACK.md`.
+under `src/content/`: the schemas are in `src/content/schema.ts` with Zod as
+their only import, and `src/content.config.ts` pairs each with its loader. The
+pages are arrangement, not words. Feedback machinery and the owner's editor both
+come from `@shaahink/sitekit` (pinned exactly) — see `FEEDBACK.md` and
+`CMS.md`.
 
-`vercel.json` is generated from `headers.config.mjs` (`npm run headers`) —
-never hand-edit it; CI fails on drift.
+Three files are generated and CI diffs all three: `vercel.json` from
+`headers.config.mjs` (`npm run headers`), `src/content`'s formatting
+(`npm run content`), and `public/editor-panel.css` from the kit
+(`npm run editor`). Never hand-edit any of them.
 
 ## Run it
 
@@ -30,6 +34,15 @@ This site is part of the **sk** fleet. The plan, the locked decisions and the
 rules every site inherits live in `shaahink/drydock` — read `PLAN.md` there
 before proposing anything architectural.
 
-Two that bite most often: handlers stay Web standard (no `@vercel/*`, no Node
-built-ins — Vercel is the host, not the platform), and CSS uses logical
-properties only, because the sites are bidirectional.
+Three that bite most often: handlers stay Web standard (no `@vercel/*`, no Node
+built-ins — Vercel is the host, not the platform); CSS uses logical properties
+only, because the sites are bidirectional; and the editor is not this repo's
+code. `src/pages/edit.astro` mounts `@shaahink/sitekit/editor` and sets this
+route's CSP, and that is the whole of it. If improving the editor would mean
+editing a site repo, the boundary is wrong and the boundary should move — say
+so rather than working around it.
+
+`src/content/schema.ts` must import nothing but Zod. A Vercel function serves
+the editor and can never reach `astro:content`, so anything Astro-shaped in
+there — including `image()` — breaks it. Take the image type as a generic
+parameter instead; nimagiti shows the shape.
