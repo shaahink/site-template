@@ -1,9 +1,17 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { editorRoute } from "@shaahink/sitekit/astro";
 
 export default defineConfig({
   /* TODO: the real production URL once the Vercel project exists. */
   site: "https://example.vercel.app",
+
+  /* The owner's editor. The whole route is the kit's — this site owns no
+     editor page, so a change to the editor's markup or its CSP arrives as a
+     version bump like every other kit change, and its URL still follows this
+     site's build.format. The title is the one part that is genuinely ours:
+     an owner should see whose site they are editing. */
+  integrations: [editorRoute({ title: "Edit — Example" })],
 
   /* Locales for this site. One entry keeps URLs unprefixed; add a second and
      Astro's i18n routing takes over — set lang/dir per locale in the layout.
