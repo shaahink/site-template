@@ -13,7 +13,7 @@
     "editor": "sitekit-editor-css"
   },
   "dependencies": {
-    "@shaahink/sitekit": "0.11.0",
+    "@shaahink/sitekit": "0.12.0",
     "astro": "7.1.4",
     "zod": "4.4.3"
   },
