@@ -7,3 +7,12 @@ meta:
 hero:
   title: "New Site"
   tagline: "Built from the sk site template. The design starts here."
+
+# A section the owner can turn off from the editor. `visible` is absent here on
+# purpose: absent means shown, and that is the point of the default — the
+# switch writes the field the first time it is used, and content files that
+# predate the feature keep working untouched.
+notes:
+  title: "Notes"
+  body: "This section can be turned off from the editor without anyone touching
+    the code. Delete it, or keep it and make it yours."
