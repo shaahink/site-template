@@ -1,8 +1,9 @@
 # The editor — the owner edits their own words
 
-A form at `/edit`, behind Google sign-in. the owner changes a line, presses
-Save, and it lands as a commit in this repo and rebuilds the site. They needs
-no GitHub account, no CMS account, and no app.
+Two ways in, both behind Google sign-in: a form at `/edit`, and tapping the
+words on the page itself. the owner changes a line, presses Save, and it lands
+as a commit in this repo and rebuilds the site. They needs no GitHub account,
+no CMS account, and no app.
 
 Public visitors see nothing and download nothing. `/edit` is a separate route,
 `noindex`, and disallowed in `robots.txt`.
@@ -16,7 +17,7 @@ an issue, still a conversation, deliberately.
 ## How it works
 
 ```
- /edit  →  Google sign-in  →  POST /api/auth  →  session cookie (1 hour)
+ /edit  →  Google sign-in  →  POST /api/auth  →  session cookie (self-renewing)
                                         |
              the panel, generated from the content schemas
                                         |
@@ -29,7 +30,7 @@ an issue, still a conversation, deliberately.
 | `src/content.config.ts` | The Astro half: each schema paired with the loader that finds its files. |
 | `src/pages/edit.astro` | The route. Mounts the panel and carries the looser CSP that Google sign-in needs, so the public pages keep theirs untouched. Twenty lines of wiring — no editor behaviour. |
 | `api/auth.ts` · `api/content.ts` | The edges: read this deployment's environment, hand off to `@shaahink/sitekit/cms`. |
-| `public/editor-panel.css` | The panel's chrome, **copied** from the kit by `npm run editor`. Never hand-edited; CI regenerates and diffs it. |
+| `public/editor-panel.css` · `public/editor-inline.css` | The panel's chrome and the on-page editing marks, **copied** from the kit by `npm run editor`. Never hand-edited; CI regenerates and diffs both. |
 | `scripts/normalize-content.mjs` | Keeps the YAML in the one form that makes edits produce small diffs. CI enforces it. |
 
 **The panel itself is not in this repo.** It is `@shaahink/sitekit/editor` —
@@ -64,6 +65,40 @@ let their text be edited. There is no add or remove button.
 Persian and Arabic fields read right-to-left inside the panel: every control
 carries `dir="auto"`, so each field decides from its own content rather than
 from the panel's language.
+
+---
+
+## Editing on the page itself
+
+The panel reaches every field. **Tapping the words reaches the ones the owner
+can point at**, which is most of what an owner actually wants to change — and
+it removes the step where they have to work out which form field corresponds to
+the sentence they are looking at.
+
+From the panel, **"Edit this page on the site"** opens the page with editing
+switched on. That link is the only way in that involves no typing, which is to
+say the only one that exists on a phone. (The long way round is adding
+`?edit=1` to the address, which is what the link does for you.)
+
+Highlighted text can be typed on. Grey text has to be changed in the panel, and
+says so when tapped — any field whose value carries markup the design depends
+on. A bar along the bottom says what is being changed, undoes one edit or all
+of them, and saves. It rides above the on-screen keyboard rather than hiding
+underneath it.
+
+It covers every piece of text the pages annotate.
+
+Some things are deliberately not editable in place, and the panel is where they
+live: anything with no visible text at all (the `<head>` facts, image
+descriptions, the aria strings), and anything belonging to a collection other
+than the page's own. A page shows one content file, so anything from a
+different one is the panel's job.
+
+**Nothing is public until Save.** Unsaved work survives a reload — it is kept
+as you type and offered back next time, never restored silently — so an
+interrupted edit on a phone is not a lost one. If the sign-in has lapsed by the
+time Save is pressed, the editor says so, keeps the work, and lets you sign in
+again without leaving the page.
 
 ---
 
