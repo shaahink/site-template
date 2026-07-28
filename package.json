@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@shaahink/sitekit": "0.14.0",
-    "astro": "7.1.4",
+    "astro": "7.1.5",
     "zod": "4.4.3"
   },
   "devDependencies": {
