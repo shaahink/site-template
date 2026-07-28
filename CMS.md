@@ -60,11 +60,48 @@ list in `src/content/schema.ts`: image pixel sizes the layout depends on,
 `order` numbers, `srcset` strings. Everything else is the owner's.
 
 Repeaters — a list of cards, a gallery's images — show the rows that exist and
-let their text be edited. There is no add or remove button.
+rows that exist, and each row can be moved up, moved down, or removed.
+Removing asks twice — the button changes to "Tap again to remove" and forgets
+the question after a few seconds, because a half-tap on a phone should not
+delete anything. "Add" puts an empty row at the bottom and scrolls to it.
+
+Every picture has a **Choose a photograph** button. It scales the file in the
+browser before anything is sent — a photograph off a phone is 3–6 MB and what
+lands in the repository is a few hundred kilobytes — writes the pixel sizes
+itself, and holds the save until the photograph has been described. That
+description is what somebody using a screen reader hears, and nothing later in
+the chain will ever ask for it. Folded away underneath is the old box for
+pointing an image at a file that is already there, which still works.
+
+A photograph and the words that go with it are **one commit**, never two, so
+the site is never briefly pointing at a picture that has not arrived yet.
+Removing a row removes the reference; the file itself stays in the repository,
+where git history can get it back.
+
 
 Persian and Arabic fields read right-to-left inside the panel: every control
 carries `dir="auto"`, so each field decides from its own content rather than
 from the panel's language.
+
+### Turning a section off
+
+A section whose schema carries `visible` gets a switch at the top of its box.
+Turning it off takes it off the site — properly off, not rendered at all, so
+nothing of it is left in the page for a search engine to find. Nothing is
+deleted: every word stays in the file and the switch is where it comes back.
+
+The template ships one, `notes`, as the working example. Decide each site's
+list deliberately: a hero, an about block and a contact block are what a page
+*is*; a seasonal offer, a gallery or a set of collaborators are what an owner
+wants a switch for.
+
+**If the site has a navigation, filter it from the same data** — see
+`src/pages/index.astro`, where the call and the trap are written out. A link
+to a section that is not rendered scrolls nowhere, silently, and the nav is the
+first thing an owner tries after turning something off.
+
+Because a section that is off is not on the page at all, the panel is the only
+place to turn it back on.
 
 ---
 
