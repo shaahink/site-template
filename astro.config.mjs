@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-import { editorRoute } from "@shaahink/sitekit/astro";
+import { checkAnnotations, editorRoute } from "@shaahink/sitekit/astro";
+import { editable } from "./src/content/schema.js";
 
 export default defineConfig({
   /* TODO: the real production URL once the Vercel project exists. */
@@ -10,8 +11,17 @@ export default defineConfig({
      editor page, so a change to the editor's markup or its CSP arrives as a
      version bump like every other kit change, and its URL still follows this
      site's build.format. The title is the one part that is genuinely ours:
-     an owner should see whose site they are editing. */
-  integrations: [editorRoute({ title: "Edit — Example" })],
+     an owner should see whose site they are editing.
+
+     `checkAnnotations` is the other half, and it fails the build: a
+     `data-sk-edit` on this site that stops resolving — a renamed field, a
+     deleted sentence, a layout change that dropped the collection attribute
+     — is an element an owner can point at that would not save. It reads the
+     same `editable` map api/content.ts hands the content handler, so the
+     build and the editor cannot disagree about what is editable. Without it
+     the rot is found by whoever opens that page in edit mode, which is the
+     owner. SCALE.md §6. */
+  integrations: [editorRoute({ title: "Edit — Example" }), checkAnnotations({ collections: editable })],
 
   /* Locales for this site. One entry keeps URLs unprefixed; add a second and
      Astro's i18n routing takes over — set lang/dir per locale in the layout.
