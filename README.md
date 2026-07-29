@@ -28,16 +28,28 @@ Then work through the TODOs:
 4. `src/content/pages/home.yaml` — real words; grow `src/content.config.ts`
    to match the content the site actually has.
 5. `api/feedback.js` — locales and time zone.
-6. `FEEDBACK.md` — one-time token + env setup, then record the review link.
+6. `FEEDBACK.md` — confirm the `sk-feedback` App covers this repo, set the env,
+   then record the review link. **There is no token to create**; the App mints a
+   short-lived one per request and signs as `sk-feedback[bot]`.
 7. `CMS.md` — the editor's one-time setup: three `CMS_*` variables and this
    site's origin added to the fleet's Google OAuth client. Until then `/edit`
    says so plainly rather than showing a button that cannot work.
-8. `src/pages/edit.astro` — restate this site's CSP directives with Google's
-   origins added. Astro replaces a directive rather than merging into it, so
-   anything astro.config adds to `connect-src` or `img-src` has to be repeated
-   there. It is the only per-site part of the editor.
-9. Link the repo to a Vercel project (`vercel link`); `vercel.json` already
-   tells it the framework and output directory.
+8. **Annotate the pages.** `Base.astro` scopes one with `data-sk-collection`
+   and `index.astro` carries four `data-sk-edit` as the worked example; every
+   element whose words come from the content wants one, so an owner edits the
+   sentence they are looking at instead of hunting for it in a form. The build
+   already fails on an annotation that would not save (`checkAnnotations`), so
+   this is checked from the first one you add.
+9. **Name the fields an owner will read** — `z.string().meta({ title: "…" })`
+   in the schema. Left to the key, the bar says "Changing Html". And give each
+   entry an `entryUrl` in the `editable` map — `"/"` is set for the one entry
+   here — which is what puts "Edit this page on the site" in the panel.
+10. **Set the Umami website id in both places it lives** — the tag in
+    `src/layouts/Base.astro` and `umamiWebsiteId` in `api/content.ts`. They are
+    the same id for the same site: the first records the visit, the second is
+    how the owner's home reads their own traffic back.
+11. Link the repo to a Vercel project (`vercel link`); `vercel.json` already
+    tells it the framework and output directory.
 
 ## Commands
 
@@ -75,9 +87,11 @@ This template encodes the fleet's rules — the reasoning lives in
 - **`src/content/schema.ts` imports nothing but Zod.** `content.config.ts`
   wraps it for the build; the editor's Vercel function imports it directly, and
   a function can never reach `astro:content`. That split is load-bearing.
-- **The editor itself is not in this repo** — it is
+- **The editor itself is not in this repo, and neither is its page** — it is
   `@shaahink/sitekit/editor`, chrome included, so improving it is a version
-  bump rather than five hand edits. `src/pages/edit.astro` mounts it and does
-  nothing else; `public/editor-panel.css` is a copy the kit makes. Do not
-  fork either. If a change to the editor would mean editing this repo, the
-  boundary is wrong and the boundary should move.
+  bump rather than five hand edits. `editorRoute()` in `astro.config.mjs`
+  injects the route, which is why there is no `src/pages/edit.astro` to find:
+  every site owned one until 0.11.0 and one change to Google's sign-in cost four
+  client-repo commits in an afternoon. `public/editor-panel.css` is a copy the
+  kit makes. Do not fork either. If a change to the editor would mean editing
+  this repo, the boundary is wrong and the boundary should move.
