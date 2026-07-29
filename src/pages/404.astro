@@ -1,0 +1,40 @@
+---
+/* The page a visitor gets for a URL this site does not have.
+
+   It has to exist as a file. A static host with no 404.html answers an unknown
+   path with 200 and the home page — Cloudflare Pages does exactly that, so a
+   mistyped link looked like a working page and search engines were free to
+   index every typo as a copy of the home page. This file is what makes the
+   host answer 404 and say so.
+
+   Its words are hard-coded, and this is the one page in the template where
+   that is right. Everything else takes its prose from src/content so the owner
+   can edit it in place — but nobody reaches a 404 in review mode to edit it,
+   and an owner who broke this page would hear about it from a visitor. Chrome,
+   not content.
+
+   No styles either, on purpose: the template ships machinery and no face
+   (styles.css says why), so this page wears whatever the site's design becomes.
+   When it gets one, style it with logical properties — margin-inline,
+   padding-block, inset-inline — like every other page in the fleet, so a
+   right-to-left locale costs nothing. */
+import Base from "../layouts/Base.astro";
+
+/* Canonical to itself, never to "/". Pointing it at the home page would tell a
+   crawler that the missing URL *is* the home page, which is the confusion this
+   file exists to end. No editCollection/editEntry, so the layout's inline
+   editing correctly finds nothing to edit here. */
+---
+
+<Base
+  title="Page not found"
+  description="This page does not exist."
+  ogDescription="This page does not exist."
+  canonical="/404"
+>
+  <main>
+    <h1>Page not found</h1>
+    <p>That page does not exist — it may have moved, or the link may be wrong.</p>
+    <p><a href="/">Go to the home page</a></p>
+  </main>
+</Base>
