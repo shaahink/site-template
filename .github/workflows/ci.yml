@@ -1,10 +1,12 @@
-# The check Renovate's auto-merge waits for. Five gates: the types hold
-# (astro check), the site builds, vercel.json still matches
-# headers.config.mjs, every content file is still normalized, and the editor's
-# stylesheet still matches the kit's. The last three work the same way —
-# regenerate, then diff — so a hand-edited vercel.json, a hand-edited content
-# file or a hand-edited editor stylesheet fails the build rather than silently
-# drifting from the form it is meant to be in.
+# The check Renovate's auto-merge waits for. The pipeline itself is not here:
+# it lives in shaahink/.github as a reusable workflow, because six sites were
+# carrying byte-similar copies of it and a seventh would have copied the
+# sixth's. One file to add the fleet's next gate to, not six to keep in step.
+#
+# What it runs, unchanged: the types hold (astro check), the site builds,
+# vercel.json still matches headers.config.mjs, every content file is still
+# normalized, and the editor's stylesheet still matches the kit's. The
+# reasoning for each gate lives beside it in site-ci.yml.
 name: CI
 
 on:
@@ -14,42 +16,6 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
-      - run: npm run check
-
-      - run: npm run build
-
-      - name: vercel.json is generated, not hand-written
-        run: |
-          npm run headers
-          git diff --exit-code -- vercel.json
-
-      # A hand edit that un-normalizes a file would make the next owner edit
-      # produce a hundred-line diff instead of a one-line one. Catch it here,
-      # while it is still one commit to fix.
-      - name: content is normalized, so owner edits stay readable
-        run: |
-          npm run content
-          git diff --exit-code -- src/content
-
-      # The editor's chrome lives in the kit and is copied here, so that the
-      # panel cannot quietly become four different panels. A hand edit to the
-      # copy is the first step of exactly that, and this is where it stops.
-      # Two files now: the panel at /edit, and inline editing on the site's own
-      # pages. `git diff` alone would miss a stylesheet the kit has started
-      # shipping but this site has never copied, so untracked files count too.
-      - name: the editor's stylesheets are the kit's, copied
-        run: |
-          npm run editor
-          test -z "$(git status --porcelain -- public/)" \
-            || { git status --porcelain -- public/; exit 1; }
+    uses: shaahink/.github/.github/workflows/site-ci.yml@main
+    with:
+      node-version: "22"
