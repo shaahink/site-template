@@ -28,7 +28,7 @@ an issue, still a conversation, deliberately.
 | --- | --- |
 | `src/content/schema.ts` | The schemas, Zod only. The build validates against them and the editor generates its form from them — one definition, both jobs. Its `editable` map says which YAML file backs which collection, and which fields to leave out. |
 | `src/content.config.ts` | The Astro half: each schema paired with the loader that finds its files. |
-| `src/pages/edit.astro` | The route. Mounts the panel and carries the looser CSP that Google sign-in needs, so the public pages keep theirs untouched. Twenty lines of wiring — no editor behaviour. |
+| `astro.config.mjs` | Where the editor is asked for: `editorRoute({ title })`. The page is **injected by the kit**, so there is no editor file in this repo to keep in step — including the looser CSP Google sign-in needs, which attaches to that route and leaves the public pages' policy untouched. The URL does not move; an injected route follows this site's own `build.format`. |
 | `api/auth.ts` · `api/content.ts` | The edges: read this deployment's environment, hand off to `@shaahink/sitekit/cms`. |
 | `public/editor-panel.css` · `public/editor-inline.css` | The panel's chrome and the on-page editing marks, **copied** from the kit by `npm run editor`. Never hand-edited; CI regenerates and diffs both. |
 | `scripts/normalize-content.mjs` | Keeps the YAML in the one form that makes edits produce small diffs. CI enforces it. |
@@ -295,12 +295,35 @@ Everything above is already here. What a new site has to do:
 3. **Run `npm run content` once**, in its own commit, before the first owner
    edit. It reflows the YAML into the form the editor writes back, so the
    owner's first save is a one-line diff rather than a hundred-line one.
-4. **Restate this site's CSP directives in `src/pages/edit.astro`.** Astro
-   replaces rather than merges, so every directive the site sets globally and
-   Google needs to widen has to be spelled out there again. It is the one part
-   of the editor that is genuinely per-site, and it changes only when the
-   site's own CSP does.
-5. **Set the three `CMS_*` environment variables**, and add this site's origin
+4. **Annotate the pages.** `data-sk-collection="<name>"` (with
+   `data-sk-entry` where a collection has more than one) on the element that
+   scopes a page, and `data-sk-edit="<field path>"` on each element whose words
+   come from the content. That is what lets an owner tap the sentence they are
+   looking at rather than find it again in a form, and it is where the per-site
+   work in this list actually is: the template ships the shape — one scope in
+   `Base.astro`, four annotations in `index.astro` — and a real site carries it
+   across every page it has. Nothing to configure: the build already reads the
+   pages back and fails on an annotation that would not save, by the same route
+   the panel judges one at runtime.
+5. **Name the fields in the owner's words** — `z.string().meta({ title: "…" })`.
+   The inline bar says "Changing {label}" while they type, and a short key makes
+   that useless: `name.fa` reads as "Fa". Add `entryUrl` to the `editable` map
+   too, so the panel can offer "Edit this page on the site" — without it the
+   only way into inline editing is typing `?edit=1` onto a URL, which nobody
+   does on a phone.
+6. **Set the Umami website id in both of its homes** — the tag in
+   `src/layouts/Base.astro` and `umamiWebsiteId` in `api/content.ts`. One id,
+   two readers: the tag records the visit and the editor's home reads the
+   traffic back. Only the first is visible if the second is wrong, so they are
+   worth setting in the same commit.
+7. **Set the three `CMS_*` environment variables**, and add this site's origin
    to the fleet's one Google OAuth client.
-6. **Add `/edit` — or `/edit.html`, if `build.format` is `file` — to the
+8. **Add `/edit` — or `/edit.html`, if `build.format` is `file` — to the
    `disallow` list** in `src/pages/robots.txt.ts`.
+
+What is *not* on this list any more, and used to be: restating this site's CSP
+directives for the editor's page. There is no page here to restate them in, and
+the theory behind the instruction was wrong anyway — `insertDirective`
+**appends** to what the site already declares rather than replacing it, read off
+a real built page in 0.11.0. So a site's own sources reach the editor route on
+their own, and the route only ever names what the editor itself loads.

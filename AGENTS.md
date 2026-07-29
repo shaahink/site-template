@@ -37,10 +37,10 @@ before proposing anything architectural.
 Three that bite most often: handlers stay Web standard (no `@vercel/*`, no Node
 built-ins — Vercel is the host, not the platform); CSS uses logical properties
 only, because the sites are bidirectional; and the editor is not this repo's
-code. `src/pages/edit.astro` mounts `@shaahink/sitekit/editor` and sets this
-route's CSP, and that is the whole of it. If improving the editor would mean
-editing a site repo, the boundary is wrong and the boundary should move — say
-so rather than working around it.
+code. `editorRoute()` in `astro.config.mjs` asks the kit to inject the page, CSP
+and all, so there is no editor file here — do not add one. If improving the
+editor would mean editing a site repo, the boundary is wrong and the boundary
+should move — say so rather than working around it.
 
 `src/content/schema.ts` must import nothing but Zod. A Vercel function serves
 the editor and can never reach `astro:content`, so anything Astro-shaped in
