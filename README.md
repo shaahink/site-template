@@ -24,6 +24,11 @@ Then work through the TODOs:
 
 1. `package.json` — name and description.
 2. `astro.config.mjs` — `site`, locales, fonts when the design chooses them.
+   **If the site reads right-to-left, read [RTL.md](RTL.md) first** — direction,
+   the Persian face, the two typography rules, digits, slugs and ZWNJ, all of it
+   measured on the two RTL sites already in the fleet. Astro's `i18n` has no
+   notion of direction, so `dir` is yours to set and there is a trap in the
+   obvious way to do it.
 3. `src/components/Footer.astro` — the client's name and URL for the credit.
 4. `src/content/pages/home.yaml` — real words; grow `src/content.config.ts`
    to match the content the site actually has.
@@ -32,8 +37,12 @@ Then work through the TODOs:
    then record the review link. **There is no token to create**; the App mints a
    short-lived one per request and signs as `sk-feedback[bot]`.
 7. `CMS.md` — the editor's one-time setup: three `CMS_*` variables and this
-   site's origin added to the fleet's Google OAuth client. Until then `/edit`
-   says so plainly rather than showing a button that cannot work.
+   site's origin added to the fleet's Google OAuth client. **Do both before you
+   show `/edit` to the owner.** With the variables set and the origin missing,
+   the page shows a complete, confident "Sign in with Google" card and Google
+   refuses the button behind it with a 403 — measured on a live site, and it
+   reads as a broken site rather than as a missing setting. The page cannot tell
+   you: an origin is a Google-console fact, not something a site can read.
 8. **Annotate the pages.** `Base.astro` scopes one with `data-sk-collection`
    and `index.astro` carries four `data-sk-edit` as the worked example; every
    element whose words come from the content wants one, so an owner edits the
@@ -77,7 +86,10 @@ This template encodes the fleet's rules — the reasoning lives in
   env read at the edge and passed in). Vercel is the host, not the platform.
 - **`vercel.json` is generated** from `headers.config.mjs` — never hand-edit
   it; CI fails on drift.
-- **New CSS uses logical properties only** — the fleet is bidirectional.
+- **New CSS uses logical properties only** — the fleet is bidirectional, and
+  two of its sites read right-to-left. Reading the stylesheet is not how you
+  check: a leaked physical property shows up as horizontal overflow in a
+  browser, which is measurable. [RTL.md §7](RTL.md) has the four measurements.
 - **Dependencies are pinned exactly**; Renovate bumps them through PRs gated
   on CI (`.github/workflows/ci.yml`: `astro check`, build, and three
   regenerate-and-diff gates — headers, content, editor stylesheet).
