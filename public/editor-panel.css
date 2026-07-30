@@ -122,18 +122,29 @@ body {
 
 .sk-editor__picker { margin-block: var(--sk-editor-gap); }
 
-/* The way onto the page itself. Deliberately given the same weight as the
-   picker rather than tucked in a corner: for an owner on a phone this is the
-   only route to inline editing that does not involve typing a query string,
-   and a route nobody finds is not a route. Sized for a thumb. */
-.sk-editor__onpage:empty { display: none; }
-.sk-editor__onpage {
-  margin-block-start: 0.75rem;
+/* The way onto the page itself, and back off it. Amended in 0.17.0, and the
+   old rule was `.sk-editor__onpage` under the picker with a paragraph about
+   how a route nobody finds is not a route.
+
+   The paragraph was right and the placement was measured wrong. §1.6 found
+   this link 1,088–1,246px down the panel on all three sites — off the bottom
+   of a phone screen, behind the welcome notice, the traffic block, the recent
+   changes and the picker itself. It is in the sticky footer now, beside Save,
+   which is the one strip of this panel that is on screen at every scroll
+   position. Still sized for a thumb. */
+.sk-editor__route:empty { display: none; }
+.sk-editor__route {
+  margin: 0;
+  /* After the file name, before Save — and the first to drop to its own line
+     when the three of them do not fit, because it is the only one of the three
+     that is not about the entry being edited. */
+  flex: 0 1 auto;
 }
-.sk-editor__onpage a {
+.sk-editor__route a {
   display: inline-block;
-  min-height: 44px;
-  padding: 0.6rem 0;
+  min-block-size: 44px;
+  /* Vertically centred against a 44px Save without a second flex context. */
+  line-height: 44px;
   font-size: 0.95rem;
 }
 
@@ -228,6 +239,117 @@ body {
   font-family: var(--sk-editor-display);
   font-size: 1.15rem;
   color: var(--sk-editor-ink);
+}
+
+/* A top-level section, closed.
+   ---------------------------------------------------------------------------
+   The panel was 11,670px on bez and 14,437 on nimagiti with the first on/off
+   switch eleven and a half screens down (§1.4, §1.8). Collapsed, the form is a
+   list of the owner's own sections — so the summary row is the primary view of
+   this editor, and it is sized like one: 44px minimum, which is the same thumb
+   floor the bar's buttons and the repeater's arrows already meet.
+
+   `display: flex` takes the native disclosure marker away, so the glyph below
+   replaces it. That is a trade worth making: a triangle that cannot be put on
+   the correct side of a Persian summary is worse than one we draw ourselves. */
+.sk-editor__group--fold {
+  /* Closed, the box is its own summary and nothing else, so it carries no
+     padding to hold — and the sections sit closer together than two open boxes
+     would, because closed they are a list of the owner's own page rather than a
+     stack of forms. */
+  margin-block: 0.4rem;
+  padding-block: 0;
+}
+.sk-editor__group--fold[open] {
+  margin-block: var(--sk-editor-gap);
+  padding-block: 0.5rem 1rem;
+}
+
+.sk-editor__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: 44px;
+  padding-inline: 0;
+  /* No block padding: the switch inside is a 44px square and the row is 44px,
+     so padding here would make the row 55 and lose the pitch this step is
+     measured on. */
+  padding-block: 0;
+  cursor: pointer;
+  /* The row is a control; a stray double-tap should open the section, not
+     select its name. */
+  user-select: none;
+  list-style: none;
+}
+.sk-editor__summary::-webkit-details-marker {
+  display: none;
+}
+.sk-editor__summary:focus-visible {
+  outline: 2px solid var(--sk-editor-accent);
+  outline-offset: 2px;
+}
+
+/* Two glyphs rather than one rotated, because the closed one points the way the
+   language reads and a transform would need mirroring to say that. */
+.sk-editor__summary::before {
+  content: "▸";
+  flex: none;
+  font-size: 0.85em;
+  color: var(--sk-editor-muted);
+}
+[dir="rtl"] .sk-editor__summary::before {
+  content: "◂";
+}
+[open] > .sk-editor__summary::before,
+[dir="rtl"] [open] > .sk-editor__summary::before {
+  content: "▾";
+}
+
+/* The name takes the row and pushes the switch and the marker to the end, so
+   every section's switch is on one vertical line down the panel. */
+.sk-editor__summarylabel {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+/* The switch, in the summary: no box of its own, because the summary is the
+   box — but a 44px square of it, because a checkbox is 18px and this is the one
+   control on the row that changes what the public sees. Measured at 18×18 on
+   the first pass, which is findable and not hittable; the square is what makes
+   the difference, and `sectionSwitch` forwards a tap on it to the input inside. */
+.sk-editor__summary .sk-editor__section {
+  flex: none;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.sk-editor__offmark {
+  flex: none;
+  font-family: var(--sk-editor-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sk-editor-muted);
+}
+.sk-editor__offmark[hidden] { display: none; }
+
+/* Named by a label, hidden from the eye. Not `display: none`, which would take
+   it out of the accessibility tree along with the sentence it is carrying. */
+.sk-editor__label--offscreen {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .sk-editor__row {
@@ -421,11 +543,19 @@ body {
 /* The whole box dims when the section is off. The fields stay editable and
    still save — an owner writing a section before turning it on is the normal
    way round — so this says "not public yet", not "not editable". */
-.sk-editor__group.is-off > *:not(.sk-editor__section):not(.sk-editor__legend) {
+.sk-editor__group.is-off > *:not(.sk-editor__section):not(.sk-editor__legend):not(.sk-editor__sectionnote) {
   opacity: 0.55;
 }
 .sk-editor__group.is-off > .sk-editor__legend {
   color: var(--sk-editor-muted);
+}
+
+/* Collapsed, the switch is in the summary and the note is the first thing
+   inside the box — so it needs the separation the switch's own box used to give
+   it, and it must not be dimmed by the rule above: it is the explanation of the
+   state, not part of what the state greys out. */
+.sk-editor__group--fold > .sk-editor__sectionnote {
+  margin-block-end: var(--sk-editor-gap);
 }
 
 /* The save bar stays reachable with a thumb. */
@@ -501,8 +631,19 @@ body {
   line-height: 1.55;
 }
 
-.sk-editor__welcomeclose {
-  margin-block-start: 0.4rem;
+/* The notice's two ways out, on one row: be shown how, or say you have read it.
+   Wrapping rather than shrinking, because "Show me how" is three words in
+   English and rather more in French, and 390px is the width that matters. */
+.sk-editor__welcomeactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+}
+
+.sk-editor__welcomeclose,
+.sk-editor__welcomeshow {
   padding: 0.55rem 1.1rem;
   border: 1px solid var(--sk-editor-line);
   border-radius: var(--sk-editor-radius);
@@ -511,6 +652,23 @@ body {
   font: inherit;
   cursor: pointer;
 }
+
+/* §2.5's one primary action. The panel's only filled button outside the save
+   bar, and it earns that: it is what the first screen is *for*, and the whole
+   reason 7.7's notice stopped being three paragraphs and a dismissal. An anchor,
+   so the 44px floor has to be laid out rather than grown into. */
+.sk-editor__welcomeshow {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  border-color: transparent;
+  background: var(--sk-editor-accent);
+  color: #0d1016;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sk-editor__welcomeshow[hidden] { display: none; }
 
 /* The way back to it. A circle in the corner rather than a line of text: it is
    for the second visit, and it should be findable without being a feature. */
