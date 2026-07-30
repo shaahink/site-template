@@ -10,7 +10,9 @@ under `src/content/`: the schemas are in `src/content/schema.ts` with Zod as
 their only import, and `src/content.config.ts` pairs each with its loader. The
 pages are arrangement, not words. Feedback machinery and the owner's editor both
 come from `@shaahink/sitekit` (pinned exactly) — see `FEEDBACK.md` and
-`CMS.md`.
+`CMS.md`. **If this site reads right-to-left, `RTL.md` is not optional
+reading** — it carries the practice measured on the fleet's two RTL sites, and
+the two traps (`dir="auto"`, and a raw font-family name) both fail silently.
 
 Three files are generated and CI diffs all three: `vercel.json` from
 `headers.config.mjs` (`npm run headers`), `src/content`'s formatting
