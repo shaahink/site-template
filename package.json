@@ -9,11 +9,11 @@
     "preview": "astro preview",
     "check": "astro check",
     "headers": "sitekit-headers",
-    "content": "node scripts/normalize-content.mjs",
+    "content": "sitekit-normalize",
     "editor": "sitekit-editor-css"
   },
   "dependencies": {
-    "@shaahink/sitekit": "0.15.0",
+    "@shaahink/sitekit": "0.16.0",
     "astro": "7.1.5",
     "zod": "4.4.3"
   },
