@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-import { checkAnnotations, editorRoute } from "@shaahink/sitekit/astro";
+import { checkAnnotations, checkPlaceholders, editorRoute } from "@shaahink/sitekit/astro";
 import { editable } from "./src/content/schema.js";
 
 export default defineConfig({
@@ -20,8 +20,37 @@ export default defineConfig({
      same `editable` map api/content.ts hands the content handler, so the
      build and the editor cannot disagree about what is editable. Without it
      the rot is found by whoever opens that page in edit mode, which is the
-     owner. SCALE.md §6. */
-  integrations: [editorRoute({ title: "Edit — Example" }), checkAnnotations({ collections: editable })],
+     owner. SCALE.md §6.
+
+     `checkPlaceholders` is that same bargain over the values rather than the
+     markup, and it came from a live page rather than from a rule: a client's
+     published contact address sat on a reserved `.example` domain for months,
+     where no mail could ever reach it, and nothing in the build, the editor
+     or the review widget had ever said a word about it — because this fleet's
+     owner-ask lists are generated from what a client's material *lacked* and
+     never from what the site *asserts*. It reads the same `editable` map that
+     `checkAnnotations` reads, refuses the build on a reserved `.example` or
+     `example.com` domain, on lorem, on TODO/FIXME/TBD and on a row of x's,
+     and prints the exact `allow:` line for a string that is genuinely meant
+     to be there — because a gate with no escape is a gate somebody deletes.
+     It runs on `build` only: a dev server that refused to start because a
+     paragraph says TODO would be a check that gets removed rather than a
+     check that gets obeyed. */
+  integrations: [
+    editorRoute({ title: "Edit — Example" }), checkAnnotations({ collections: editable }),
+    checkPlaceholders({
+      collections: editable,
+      /* Two escapes, and they are correct *here* and nowhere else. This
+         is the template: its meta description and its og description are
+         `TODO:` on purpose, because they are two of the sentences a new
+         site has to write for itself, and the TODO is the instruction.
+
+         **Delete both lines when you start a real site** — and then the
+         build will not go green until you have written them, which is
+         exactly the service this gate is for. */
+      allow: ["homePage:meta.description", "homePage:meta.ogDescription"]
+    })
+  ],
 
   /* Locales for this site. One entry keeps URLs unprefixed; add a second and
      Astro's i18n routing takes over — set lang/dir per locale in the layout.
