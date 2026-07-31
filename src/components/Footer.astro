@@ -13,8 +13,9 @@ import { absolute } from "@shaahink/sitekit/seo";
 const site = { name: "New Site", url: absolute(Astro.site!) };
 
 /* The whole credit sentence is the kit's since 0.23.0 — a site no longer
-   writes the words around the name. Pass `lang` on a site with more than one
-   language; the default is English. */
+   writes the words around the name — and since 0.24.0 it is English on every
+   site whatever language the page is in. There is nothing to pass and nothing
+   to translate: it is the studio's signature, not the page's speech. */
 const credit = creditsFor({ siteName: site.name, siteUrl: site.url });
 ---
 
