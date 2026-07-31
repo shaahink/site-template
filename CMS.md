@@ -5,12 +5,37 @@ words on the page itself. the owner changes a line, presses Save, and it lands
 as a commit in this repo and rebuilds the site. They needs no GitHub account,
 no CMS account, and no app.
 
-Public visitors see nothing and download nothing. `/edit` is a separate route,
-`noindex`, and disallowed in `robots.txt`.
+A visitor sees nothing of it: `/edit` is a separate route, `noindex`, and
+disallowed in `robots.txt`, and no page a visitor lands on links to it. A
+visitor does *download* one thing, and this file claimed otherwise for four
+rounds: every public page `<link>`s the review widget's stylesheet, about
+7.6 kB, because Astro hoists CSS that anything in a page's script graph can
+reach — even when both imports to it are dynamic and behind a `localStorage`
+check. Measured signed-out against the live sites again on 2026-07-31, which
+is the only reason this paragraph is now the shape it is.
 
 This is Tier 1 of PLAN §3.9 — text, in the shapes the content schemas already
-describe. Adding a section, reordering a list or uploading a new image: still
-an issue, still a conversation, deliberately.
+describe. Inside those shapes the panel does more than this file used to say:
+a list's rows can be added, removed and reordered, and an image field is a
+picker that uploads a new photograph. Both arrived in 7.6. Since 0.20.0 the
+panel also searches every page of this site for a word the owner can see,
+offers the same page in the site's other language where there is one, and can
+put a change back — the last five saves are listed and any of them can be
+restored as a new commit.
+
+What is still an issue and still a conversation is a shape that does not
+exist yet: a new section, a new page, an eleventh entry in a collection. That
+one is deliberate rather than unbuilt. A new entry needs a slug, a place in
+the nav, a sitemap entry and a translation, and those are four decisions this
+site's own structure makes today — the editor would be inventing them, once
+per site, with nobody to ask. `sessions/23-cms-gaps.md` in `shaahink/drydock`
+argues that boundary rather than assuming it.
+
+> Corrected 2026-07-31, and written in general terms on purpose. This
+> paragraph used to name three things this site could not do, and two of them
+> had shipped in 7.6. Every copy said so in its own personalised wording, so
+> no one edit could fix them and nobody made seven. It is why session 23 was
+> told to read the sources and drive the editor rather than read the docs.
 
 ---
 
