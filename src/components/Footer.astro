@@ -4,7 +4,7 @@
    schema.org JSON-LD naming sk as the site's creator (PLAN §3.3).
    Presentation stays with the site: style .sk-credit however the design
    wants, but the anchor itself is always the kit's. */
-import { creditsAnchor, creditsJsonLd } from "@shaahink/sitekit/credits";
+import { creditsFor } from "@shaahink/sitekit/credits";
 import { absolute } from "@shaahink/sitekit/seo";
 
 /* TODO: the client's name. The url is derived, not stated: astro.config's
@@ -12,9 +12,10 @@ import { absolute } from "@shaahink/sitekit/seo";
    touches this file. */
 const site = { name: "New Site", url: absolute(Astro.site!) };
 
-const credit =
-  creditsAnchor({ siteName: site.name, siteUrl: site.url }) +
-  creditsJsonLd({ siteName: site.name, siteUrl: site.url });
+/* The whole credit sentence is the kit's since 0.23.0 — a site no longer
+   writes the words around the name. Pass `lang` on a site with more than one
+   language; the default is English. */
+const credit = creditsFor({ siteName: site.name, siteUrl: site.url });
 ---
 
 <footer>
