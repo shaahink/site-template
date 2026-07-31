@@ -48,3 +48,21 @@ should move — say so rather than working around it.
 the editor and can never reach `astro:content`, so anything Astro-shaped in
 there — including `image()` — breaks it. Take the image type as a generic
 parameter instead; nimagiti shows the shape.
+
+## A pull request nobody should merge yet
+
+The fleet's `catchup.mjs` reads every open PR in this repo and merges the ones
+whose build is green, unattended and between sessions. That is what it is for,
+and it is wrong exactly once: when a person is still deciding. It has merged an
+unpicked redesign onto a client's live site that way.
+
+So say so on the PR itself, where the tool looks:
+
+```bash
+gh pr edit <n> --add-label do-not-merge
+```
+
+It is refused by name and the reason is printed. Draft status is refused too,
+and both are now printed rather than silently skipped — but the label is the
+sturdier of the two, because it survives a PR being marked ready for review. A
+note in a plan file protects nothing: the tool does not read plan files.
