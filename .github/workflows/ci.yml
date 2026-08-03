@@ -13,6 +13,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  # The pipeline this calls lives in another repository, so a change there can
+  # break this site without anything here changing — and with only push and
+  # pull_request there was no way to re-ask the question. Dispatch lets the
+  # shared workflow be re-proven from `main` on demand, which is what a
+  # downstream caller is for.
+  workflow_dispatch:
 
 jobs:
   build:
