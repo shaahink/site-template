@@ -1,0 +1,43 @@
+# Line endings are LF, on every platform, checkout included.
+#
+# Not a style preference — three of the checks a site inherits from this
+# template work by regenerating a file and diffing it (vercel.json, src/content,
+# public/editor-*.css), and the generators are Node scripts that write LF.
+#
+# Git for Windows ships core.autocrlf=true, so a fresh clone writes CRLF into
+# the working tree while the blobs stay LF. The very first `npm run headers` or
+# `npm run editor` then rewrites those files as LF, and git reports all three as
+# modified while `git diff` shows nothing at all:
+#
+#     $ npm run editor && git status --porcelain -- public/
+#      M public/editor-inline.css
+#      M public/editor-panel.css
+#     $ git diff -- public/
+#     warning: LF will be replaced by CRLF in public/editor-inline.css
+#     (no diff)
+#
+# That state is genuinely hard to read — measured on a fresh clone of this
+# template on 2026-08-06 — and the instinct it teaches ("commit whatever
+# appeared") is the wrong one to learn on a repo whose CI diffs generated files.
+# It bites hardest on a site driven by an agent, where a generated-files gate
+# goes red on session one for a reason no one can see in a diff.
+#
+# eol=lf makes the checkout match what the generators produce, so the gates
+# behave the same on a Windows laptop as they do on CI's ubuntu-latest.
+#
+# Inherited by every site created from this template, which is the point:
+# sk-studio hit this, solved it, and documented it, and every new site was
+# repeating the discovery.
+* text=auto eol=lf
+
+# Binary, byte for byte.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.mp4 binary
+*.pdf binary
